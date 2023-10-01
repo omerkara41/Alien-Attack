@@ -1,9 +1,31 @@
-[gd_scene load_steps=3 format=3 uid="uid://r6nx3e1vd8lk"]
+[gd_scene load_steps=10 format=3 uid="uid://r6nx3e1vd8lk"]
 
+[ext_resource type="Script" path="res://Scripts/main_scene.gd" id="1_koyub"]
 [ext_resource type="Texture2D" uid="uid://5a8p7j7mg2q8" path="res://Assets/alien_attack_assets/textures/bg.png" id="1_s60xk"]
 [ext_resource type="PackedScene" uid="uid://br2gehjpipua8" path="res://Scenes/player.tscn" id="2_ro5hq"]
+[ext_resource type="PackedScene" uid="uid://cxq82p0hdjcya" path="res://Scenes/hud.tscn" id="2_wnkmi"]
+[ext_resource type="PackedScene" uid="uid://b84v5gteoq76n" path="res://Scenes/enemy_spawnner.tscn" id="3_lopk8"]
+[ext_resource type="AudioStream" uid="uid://d0u54p3tm4mow" path="res://Assets/alien_attack_assets/audio/explode.wav" id="6_pmceo"]
+[ext_resource type="AudioStream" uid="uid://cl2pxt75aje2k" path="res://Assets/alien_attack_assets/audio/hit.wav" id="7_qqb0i"]
+[ext_resource type="AudioStream" uid="uid://duatei303vpml" path="res://Assets/alien_attack_assets/audio/sfx_laser2.wav" id="8_m6nsb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d0p1h"]
+size = Vector2(375, 1208)
 
 [node name="MainScene" type="Node2D"]
+script = ExtResource("1_koyub")
+
+[node name="IU" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HUD" parent="IU" instance=ExtResource("2_wnkmi")]
+layout_mode = 1
 
 [node name="BackGround" type="TextureRect" parent="."]
 z_index = -1000
@@ -20,3 +42,29 @@ texture = ExtResource("1_s60xk")
 stretch_mode = 1
 
 [node name="Player" parent="." instance=ExtResource("2_ro5hq")]
+position = Vector2(112, 347)
+
+[node name="Enemy Spawnner" parent="." instance=ExtResource("3_lopk8")]
+
+[node name="EnemyDeathZone" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyDeathZone"]
+position = Vector2(-433.5, 385)
+shape = SubResource("RectangleShape2D_d0p1h")
+
+[node name="Sounds" type="Node2D" parent="."]
+
+[node name="ExplodeSound" type="AudioStreamPlayer2D" parent="Sounds"]
+stream = ExtResource("6_pmceo")
+
+[node name="HitSound" type="AudioStreamPlayer2D" parent="Sounds"]
+stream = ExtResource("7_qqb0i")
+
+[node name="EnemyDiedSound" type="AudioStreamPlayer2D" parent="Sounds"]
+stream = ExtResource("8_m6nsb")
+
+[connection signal="player_is_dead" from="Player" to="." method="_on_player_player_is_dead"]
+[connection signal="rocked_launced" from="Player" to="." method="_on_player_rocked_launced"]
+[connection signal="body_entered" from="EnemyDeathZone" to="." method="_on_enemy_death_zone_body_entered"]
